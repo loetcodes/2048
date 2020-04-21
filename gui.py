@@ -19,7 +19,7 @@ import constants
 from game import TwentyFortyEight
 
 # Window size constants
-WIDTH = 800
+WIDTH = 900
 HEIGHT = 600
 
 # Main game grid constants
@@ -43,7 +43,9 @@ class GameGui(tk.Frame):
 
         self.panel_width = self.get_side_panel_width()
         self.init_panels()
-        self.add_control_buttons()
+        self.init_game_text()
+        # self.init_game_score()
+        # self.init_game_button()
         self.grid_widget = self.init_grid_widget()
 
         self.init_grid_cells()
@@ -65,8 +67,38 @@ class GameGui(tk.Frame):
         self.main_container.pack(anchor=tk.N, fill=tk.BOTH, expand=True, side=tk.LEFT)
 
 
-    def add_control_buttons(self):
-        """ Add control buttons the the left panel.
+    def init_game_text(self):
+        """ Initializes the side panel with the Game title and instructions.
+        """
+        if self.panel_width:
+            # Add the title label and instructions.
+            title_style = constants.TITLE_FONT
+            info_style = constants.TEXT_FONT
+            title_width = self.panel_width // 4
+            title = tk.Label(master=self.side_panel, text="2048",
+                             bg=self.theme["cell_background"][2048],
+                             fg=self.theme["cell_color"][2048], justify=tk.CENTER,
+                             font=title_style, padx=title_width, pady=title_width)
+            title.pack(ipady=10)
+            # Add instructions
+            info_text = """ Use the arrow keys to \n merge the tiles to \n get the 2048 tile!"""
+            info = tk.Label(master=self.side_panel, text=info_text,
+                            bg=self.theme["side_panel"],
+                            fg=self.theme["side_panel_txt"],
+                            justify=tk.CENTER, font=info_style, padx=20, pady=title_width)
+            info.pack()
+
+
+    def init_game_score(self):
+        """ Initializes the Game score content.
+        """
+        if self.panel_width:
+            # Add buttons to the panel
+            pass
+
+
+    def init_game_button(self):
+        """ Initializes the New Game button.
         """
         if self.panel_width:
             # Add buttons to the panel
@@ -207,7 +239,6 @@ def run_gui():
     # Initialize and run the gui
     app = GameGui(new_game, grid_dimensions, main_theme, root)
     app.mainloop()
-
 
 
 if __name__ == "__main__":

@@ -43,6 +43,7 @@ class TwentyFortyEight:
         self._grid_cols = grid_width
         self._grid_rows = grid_height
         self._directions = dict()
+        self._score = 0
 
         # Store direction indexes
         self._directions[constants.UP] = [(0, col) for col in range(self._grid_cols)]
@@ -163,6 +164,8 @@ class TwentyFortyEight:
                 self.set_tile(row, col, new_value)
                 if new_value != line_values[pos]:
                     tile_change = 1
+            # Score any merged_tiles
+            self._score += utils.sum_new_tiles(line_values, new_tiles)
 
         # Check if any tile changed.
         if tile_change == 1:
@@ -171,7 +174,9 @@ class TwentyFortyEight:
 
     def reset(self):
         """ Resets the game to an empty board with only 2 new tiles.
+        Reset score to 0
         """
+        self._score = 0
         self._grid_values = [[0 for col in range(self._grid_cols)]
                              for row in range(self._grid_rows)]
         for _ in range(2):

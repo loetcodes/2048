@@ -38,10 +38,14 @@ OFFSETS = {
 
 # Font
 FONT = ("Verdana", 32, "bold")
+TITLE_FONT = ("Verdana", 38, "bold")
+TEXT_FONT = ("Verdana", 18, "bold")
+
 
 # Default Brown theme
 DEFAULT_THEME = {
     'side_panel': "#c9c9c9",
+    'side_panel_txt' : "#776e65",
     'main_panel': "#313131",
     'grid_background': "#bbada0",
     'cell_background': {
