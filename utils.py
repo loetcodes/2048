@@ -4,8 +4,9 @@
 # Version: 1.0.0
 # Date: 11-04-2020
 # Author: loet
-# Copyright: 2020 loet
-# License: MIT license
+# 
+# MIT License
+# Copyright (c) 2020 Louisa
 #
 #--------------------------------------------------------------------
 
@@ -39,7 +40,20 @@ def merge(line):
     return result_vals
 
 
-def sum_new_tiles(original_line, new_line):
-    """ Compare the new_line and original_line. Returns the sum
-    of the difference between the two.
+def sum_new_tiles(line):
+    """ Get the sum of tiles that merged together.
     """
+    total = 0
+    first_tile, second_tile = 0, 1
+    while second_tile < len(line):
+        if line[first_tile] == line[second_tile]:
+            total += line[first_tile] * 2
+            first_tile = second_tile + 1
+            second_tile += 2
+        elif line[second_tile] == 0:
+            second_tile += 1
+        else:
+            first_tile += 1
+            second_tile = first_tile + 1
+
+    return total
