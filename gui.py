@@ -19,12 +19,10 @@ import tkinter as tk
 import constants
 from game import TwentyFortyEight
 
-# Window size constants
+# Window size and main grid
 WIDTH = 900
 HEIGHT = 600
 MIN_SIDE_PANEL = 300
-
-# Main game grid constants
 GRID_SIZE = 4
 GRID_PADDING = 10
 
@@ -41,6 +39,7 @@ class GameGui(tk.Frame):
         self.grid_cells = []
 
         self.score = None
+        self.final_result = None
         self.aspect_ratio = 1.0
         self.bind_direction_keys()
         self.panel_width = self.get_side_panel_width()
@@ -72,6 +71,7 @@ class GameGui(tk.Frame):
         if self.panel_width >= MIN_SIDE_PANEL:
             self.init_text()
             self.init_score()
+            self.display_result()
             self.new_game_button()
 
 
@@ -81,13 +81,12 @@ class GameGui(tk.Frame):
         # Add the title label and instructions.
         title_style = constants.TITLE_FONT
         info_style = constants.TEXT_FONT
-        title_width = self.panel_width // 4
+        title_width = self.panel_width // 6
         title = tk.Label(master=self.side_panel, text="2048",
                          bg=self.theme["cell_background"][2048],
                          fg=self.theme["cell_color"][2048], justify=tk.CENTER,
                          font=title_style, padx=title_width, pady=title_width//2)
         title.pack()
-        # Add instructions
         info_text = """ Use the arrow keys to \n merge the tiles to \n get the 2048 tile!"""
         info = tk.Label(master=self.side_panel, text=info_text,
                         bg=self.theme["side_background"],
@@ -128,6 +127,20 @@ class GameGui(tk.Frame):
         button_name.bind('<Button-1>', self.new_game)
 
 
+    def display_result(self):
+        """ Displays the final result of the current game.
+        Whether they won or lost.
+        """
+        result_value = self.game.get_final_result()
+        result_width = self.panel_width // 10
+        result_style = constants.SCORE_FONT
+        self.final_result = tk.Label(master=self.side_panel, text=result_value,
+                                     bg=self.theme["side_background"], fg=self.theme["side_color"],
+                                     justify=tk.CENTER, font=result_style, padx=result_width,
+                                     pady=result_width//2)
+        self.final_result.pack(pady=result_width//2)
+
+
     def key_down(self, event):
         """ Keydown event handler for directions
         """
@@ -136,14 +149,11 @@ class GameGui(tk.Frame):
             # Move tiles based on directions, then update display
             value = constants.DIRECTIONS[direction_name]
             self.game.move(value)
-            self.update_gui()
 
-        # Check if any more valid moves, if not, end game
+        # Check if any more valid moves, if not, end game, display result.
         if self.game.no_valid_moves():
-            print("The Game is over")
             self.game.set_final_result()
-        else:
-            print("Game continues")
+        self.update_gui()
 
 
     def bind_direction_keys(self):
@@ -237,10 +247,12 @@ class GameGui(tk.Frame):
                 tile_txt = str(tile) if tile != 0 else ""
                 curr_cell.configure(text=tile_txt, bg=self.theme["cell_background"][tile],
                                     fg=self.theme["cell_color"][tile])
-        # Update score and pending tasks
+        # Update score, game message and pending tasks
         try:
             new_score = str(self.game.get_score())
             self.score.configure(text=new_score)
+            result = self.game.get_final_result()
+            self.final_result.configure(text=result)
         except AttributeError:
             pass
         self.update_idletasks()

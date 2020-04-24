@@ -11,7 +11,7 @@
 
 """
 2048 main game play.
-Models the key movement and game rules.
+Models the game rules.
 Works on any arbitrary width and height.
 """
 
@@ -29,6 +29,7 @@ class TwentyFortyEight:
         self._grid_cols = grid_width
         self._grid_rows = grid_height
         self._directions = dict()
+        self._grid_values = []
         self._result = ""
         self._directions[constants.UP] = [(0, col) for col in range(self._grid_cols)]
         self._directions[constants.DOWN] = [(self._grid_rows - 1, col)
@@ -133,7 +134,8 @@ class TwentyFortyEight:
 
 
     def set_final_result(self):
-        """ Sets the game result. Game is won if their is atleast one 2048 tile
+        """ Game is over, sets the final result. Game is won if their is 
+        atleast one 2048 tile.
         """
         message = "You Lost!"
         for row in self._grid_values:
@@ -147,35 +149,25 @@ class TwentyFortyEight:
         """ Checks if their are any more valid moves that result in a change to the game.
         Returns True or False
         """
-        # If 0 in grid, there are valid moves
-        # for row in self._grid_values:
-        #     if 0 in row:
-        #         return False
-        # No empty tiles, check if any move will change the grid.
-        current_grid = [row for row in self._grid_values]
-        print("Original Grid is", current_grid)
-
-        for direction in constants.DIRECTIONS.values():
-            print("------------------")
-            print("Moving in the ", direction)
-            print("Original grid:")
-            print(current_grid)
-            print("New grid would be")
-            self.move(direction)
-            print(self._grid_values)
-
-            for row, values in enumerate(current_grid):
-                print("Row", row, ": Original Grid", values)
-                print("Row", row, ": New Grid", self._grid_values[row])
-                print("Row Result", values == self._grid_values[row])
-                if values != self._grid_values[row]:
-                    print("Row can change, game continues.")
-                    return False
-            print("------------------")
-
-            if self._grid_values != current_grid:
+        # If zero in grid, there are valid moves
+        for row in self._grid_values:
+            if 0 in row:
                 return False
 
+        # No empty tiles, copy grid and check available moves
+        current_grid = [[item for item in row] for row in self._grid_values]
+
+        # Move in each direction checking if each position contains same items.
+        for direction in constants.DIRECTIONS.values():
+            self.move(direction)
+            # Check if each position contains same items
+            for row, values in enumerate(current_grid):
+                if len(values) == len(self._grid_values[row]):
+                    total = sum([1 for i, j in zip(current_grid, self._grid_values) if i == j])
+                    if len(values) != total:
+                        # Return the grid to its original state
+                        self._grid_values = current_grid
+                        return False
         return True
 
 
