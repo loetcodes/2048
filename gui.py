@@ -22,6 +22,7 @@ from game import TwentyFortyEight
 # Window size constants
 WIDTH = 900
 HEIGHT = 600
+MIN_SIDE_PANEL = 300
 
 # Main game grid constants
 GRID_SIZE = 4
@@ -38,17 +39,14 @@ class GameGui(tk.Frame):
         self.dimension = dimensions
         self.theme = theme
         self.grid_cells = []
+
+        self.score = None
         self.aspect_ratio = 1.0
-
-        self.bind_keys()
-
+        self.bind_direction_keys()
         self.panel_width = self.get_side_panel_width()
         self.init_panels()
-        self.init_game_text()
-        # self.init_game_score()
-        # self.init_game_button()
+        self.init_side_content()
         self.grid_widget = self.init_grid_widget()
-
         self.init_grid_cells()
         self.constrain_content(self.grid_widget, self.main_container, self.aspect_ratio)
         self.mainloop()
@@ -58,67 +56,98 @@ class GameGui(tk.Frame):
         """ Initializes window panels of given width and window height
         Returns a Frame.
         """
-        # Left side panel
-        if self.panel_width:
-            self.side_panel = tk.Frame(bg=self.theme["side_panel"], width=self.panel_width)
+        # Main container and left side panel
+        self.main_container = tk.Frame(bg=self.theme["main_background"], 
+                                       width=self.dimension["height"])
+        self.main_container.pack(anchor=tk.N, fill=tk.BOTH, expand=True, side=tk.RIGHT)
+        if self.panel_width >= MIN_SIDE_PANEL:
+            self.side_panel = tk.Frame(bg=self.theme["side_background"], width=self.panel_width)
             self.side_panel.pack(anchor=tk.N, fill=tk.BOTH, expand=True, side=tk.LEFT)
 
-        # Main container
-        self.main_container = tk.Frame(bg=self.theme["main_panel"], width=self.dimension["height"])
-        self.main_container.pack(anchor=tk.N, fill=tk.BOTH, expand=True, side=tk.LEFT)
+
+    def init_side_content(self):
+        """ Initializes side panel content, i.e the title, instructions, score and new game
+        button if the side panel is of atleast minimum width.
+        """
+        if self.panel_width >= MIN_SIDE_PANEL:
+            self.init_text()
+            self.init_score()
+            self.new_game_button()
 
 
-    def init_game_text(self):
+    def init_text(self):
         """ Initializes the side panel with the Game title and instructions.
         """
-        if self.panel_width:
-            # Add the title label and instructions.
-            title_style = constants.TITLE_FONT
-            info_style = constants.TEXT_FONT
-            title_width = self.panel_width // 4
-            title = tk.Label(master=self.side_panel, text="2048",
-                             bg=self.theme["cell_background"][2048],
-                             fg=self.theme["cell_color"][2048], justify=tk.CENTER,
-                             font=title_style, padx=title_width, pady=title_width)
-            title.pack(ipady=10)
-            # Add instructions
-            info_text = """ Use the arrow keys to \n merge the tiles to \n get the 2048 tile!"""
-            info = tk.Label(master=self.side_panel, text=info_text,
-                            bg=self.theme["side_panel"],
-                            fg=self.theme["side_panel_txt"],
-                            justify=tk.CENTER, font=info_style, padx=20, pady=title_width)
-            info.pack()
+        # Add the title label and instructions.
+        title_style = constants.TITLE_FONT
+        info_style = constants.TEXT_FONT
+        title_width = self.panel_width // 4
+        title = tk.Label(master=self.side_panel, text="2048",
+                         bg=self.theme["cell_background"][2048],
+                         fg=self.theme["cell_color"][2048], justify=tk.CENTER,
+                         font=title_style, padx=title_width, pady=title_width//2)
+        title.pack()
+        # Add instructions
+        info_text = """ Use the arrow keys to \n merge the tiles to \n get the 2048 tile!"""
+        info = tk.Label(master=self.side_panel, text=info_text,
+                        bg=self.theme["side_background"],
+                        fg=self.theme["side_color"],
+                        justify=tk.CENTER, font=info_style, padx=20, pady=title_width)
+        info.pack()
 
 
-    def init_game_score(self):
-        """ Initializes the Game score content.
+    def init_score(self):
+        """ Initializes the side panel with the Game score content.
         """
-        if self.panel_width:
-            # Add buttons to the panel
-            pass
+        # Add Score title and value to the panel
+        score_style = constants.SCORE_FONT
+        score_width = self.panel_width // 10
+        score_name = tk.Label(master=self.side_panel, text="Score",
+                              bg=self.theme["side_background"],
+                              fg=self.theme["side_color"], justify=tk.CENTER,
+                              font=score_style, padx=score_width, pady=score_width//2)
+        score_name.pack()
+        score_value = str(self.game.get_score())
+        self.score = tk.Label(master=self.side_panel, text=score_value,
+                              bg=self.theme["side_background"],
+                              fg=self.theme["side_color"], justify=tk.CENTER,
+                              font=score_style)
+        self.score.pack()
 
 
-    def init_game_button(self):
-        """ Initializes the New Game button.
+    def new_game_button(self):
+        """ Button that starts a new game.
         """
-        if self.panel_width:
-            # Add buttons to the panel
-            pass
+        button_width = self.panel_width // 10
+        button_style = constants.BUTTON_FONT
+        button_name = tk.Label(master=self.side_panel, text="NEW GAME",
+                               bg=self.theme["button_background"],
+                               fg=self.theme["button_color"], justify=tk.CENTER,
+                               font=button_style, padx=button_width, pady=button_width//2)
+        button_name.pack(pady=button_width)
+        button_name.bind('<Button-1>', self.new_game)
 
 
     def key_down(self, event):
-        """ Keydown event handler
+        """ Keydown event handler for directions
         """
         direction_name = event.keysym
         if direction_name in constants.DIRECTIONS.keys():
             # Move tiles based on directions, then update display
             value = constants.DIRECTIONS[direction_name]
             self.game.move(value)
-            self.update_grid_cells()
+            self.update_gui()
+
+        # Check if any more valid moves, if not, end game
+        if self.game.no_valid_moves():
+            print("The Game is over")
+            self.game.set_final_result()
+        else:
+            print("Game continues")
 
 
-    def bind_keys(self):
-        """ Bind main arrow key directions to events.
+    def bind_direction_keys(self):
+        """ Bind main key directions to events.
         """
         for name in constants.DIRECTIONS:
             direction = "<" + name + ">"
@@ -194,9 +223,10 @@ class GameGui(tk.Frame):
         padding_frame.bind("<Configure>", set_aspect)
 
 
-    def update_grid_cells(self):
-        """ Updates the grid cells with new values from the game.
+    def update_gui(self):
+        """ Updates the gui grid cells with new values from the game and new score.
         """
+        # Update grid cells
         total_rows = self.game.get_grid_height()
         total_cols = self.game.get_grid_width()
         for row in range(total_rows):
@@ -207,13 +237,22 @@ class GameGui(tk.Frame):
                 tile_txt = str(tile) if tile != 0 else ""
                 curr_cell.configure(text=tile_txt, bg=self.theme["cell_background"][tile],
                                     fg=self.theme["cell_color"][tile])
+        # Update score and pending tasks
+        try:
+            new_score = str(self.game.get_score())
+            self.score.configure(text=new_score)
+        except AttributeError:
+            pass
         self.update_idletasks()
 
 
-    def start(self):
-        """ Start the game
+    def new_game(self, event):
+        """ Starts a new game on the gui.
         """
+        event.widget.focus_set()
         self.game.reset()
+        self.update_gui()
+
 
 
 def run_gui():
@@ -236,8 +275,6 @@ def run_gui():
 
     # New game
     new_game = TwentyFortyEight(GRID_SIZE, GRID_SIZE)
-
-    # Initialize and run the gui
     app = GameGui(new_game, grid_dimensions, main_theme, root)
     app.mainloop()
 

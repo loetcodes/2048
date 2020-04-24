@@ -39,16 +39,20 @@ OFFSETS = {
 
 # Font
 FONT = ("Verdana", 32, "bold")
-TITLE_FONT = ("Verdana", 38, "bold")
-TEXT_FONT = ("Verdana", 18, "bold")
+TITLE_FONT = ("Verdana", 40, "bold")
+TEXT_FONT = ("Verdana", 14, "bold")
+SCORE_FONT = ("Verdana", 20, "bold")
+BUTTON_FONT = ("Verdana", 14, "bold")
 
 
 # Default Brown theme
 DEFAULT_THEME = {
-    'side_panel': "#c9c9c9",
-    'side_panel_txt' : "#776e65",
-    'main_panel': "#313131",
+    'side_background': "#c9c9c9",
+    'side_color' : "#776e65",
+    'main_background': "#313131",
     'grid_background': "#bbada0",
+    'button_background': "#bbada0", 
+    'button_color': "#f9f6f2",
     'cell_background': {
         0: "#cdc1b4",
         2: "#eee4da",

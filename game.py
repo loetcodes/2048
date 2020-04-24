@@ -19,20 +19,6 @@ import random
 import utils
 import constants
 
-# # Directions
-# UP = 1
-# DOWN = 2
-# LEFT = 3
-# RIGHT = 4
-
-# # Offsets for computing tile indices in each direction.
-# OFFSETS = {
-#     UP: (1, 0),
-#     DOWN: (-1, 0),
-#     LEFT: (0, 1),
-#     RIGHT: (0, -1)
-# }
-
 
 class TwentyFortyEight:
     """
@@ -43,15 +29,13 @@ class TwentyFortyEight:
         self._grid_cols = grid_width
         self._grid_rows = grid_height
         self._directions = dict()
-        self._score = 0
-
-        # Store direction indexes
+        self._result = ""
         self._directions[constants.UP] = [(0, col) for col in range(self._grid_cols)]
-        self._directions[constants.DOWN] = [(self._grid_rows - 1, col) for col in range(self._grid_cols)]
+        self._directions[constants.DOWN] = [(self._grid_rows - 1, col)
+                                            for col in range(self._grid_cols)]
         self._directions[constants.LEFT] = [(row, 0) for row in range(self._grid_rows)]
-        self._directions[constants.RIGHT] = [(row, self._grid_cols - 1) for row in range(self._grid_rows)]
-
-        # Reset initial game
+        self._directions[constants.RIGHT] = [(row, self._grid_cols - 1)
+                                             for row in range(self._grid_rows)]
         self.reset()
 
 
@@ -95,7 +79,7 @@ class TwentyFortyEight:
         tile_col = random.randrange(0, self._grid_cols)
 
         # Option 1: Use a while loop
-        # Keep looking for a zero, may break if a zero isnt available
+        # Keep looking for a zero
         while self.get_tile(tile_row, tile_col) != 0:
             tile_row = random.randrange(0, self._grid_rows)
             tile_col = random.randrange(0, self._grid_cols)
@@ -137,6 +121,64 @@ class TwentyFortyEight:
         return line_values, line_section
 
 
+    def get_score(self):
+        """ Gets the current grid score.
+        """
+        return self._score
+
+    def get_final_result(self):
+        """ Gets the final game result
+        """
+        return self._result
+
+
+    def set_final_result(self):
+        """ Sets the game result. Game is won if their is atleast one 2048 tile
+        """
+        message = "You Lost!"
+        for row in self._grid_values:
+            if 2048 in row:
+                message = "You Won!"
+                break
+        self._result = message
+
+
+    def no_valid_moves(self):
+        """ Checks if their are any more valid moves that result in a change to the game.
+        Returns True or False
+        """
+        # If 0 in grid, there are valid moves
+        # for row in self._grid_values:
+        #     if 0 in row:
+        #         return False
+        # No empty tiles, check if any move will change the grid.
+        current_grid = [row for row in self._grid_values]
+        print("Original Grid is", current_grid)
+
+        for direction in constants.DIRECTIONS.values():
+            print("------------------")
+            print("Moving in the ", direction)
+            print("Original grid:")
+            print(current_grid)
+            print("New grid would be")
+            self.move(direction)
+            print(self._grid_values)
+
+            for row, values in enumerate(current_grid):
+                print("Row", row, ": Original Grid", values)
+                print("Row", row, ": New Grid", self._grid_values[row])
+                print("Row Result", values == self._grid_values[row])
+                if values != self._grid_values[row]:
+                    print("Row can change, game continues.")
+                    return False
+            print("------------------")
+
+            if self._grid_values != current_grid:
+                return False
+
+        return True
+
+
     def move(self, direction):
         """ Moves all tiles in a given direction.
         Adds a new tile if any tiles are moved.
@@ -165,9 +207,9 @@ class TwentyFortyEight:
                 if new_value != line_values[pos]:
                     tile_change = 1
             # Score any merged_tiles
-            self._score += utils.sum_new_tiles(line_values, new_tiles)
+            self._score += utils.sum_new_tiles(line_values)
 
-        # Check if any tile changed.
+        # Check if any tile changed, add new tile.
         if tile_change == 1:
             self.new_tile()
 
@@ -177,6 +219,7 @@ class TwentyFortyEight:
         Reset score to 0
         """
         self._score = 0
+        self._result = ""
         self._grid_values = [[0 for col in range(self._grid_cols)]
                              for row in range(self._grid_rows)]
         for _ in range(2):
