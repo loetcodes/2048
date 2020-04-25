@@ -13,11 +13,6 @@ A Desktop version of the popular 2048 game made in Python!!
 
 
 
-<h2>Features</h2>
-<p>Play the popular 2048 game on your desktop</p>
-
-
-
 <h2>How to Run</h2>
 <p>Download this repo in a folder of your choosing.
 Confirm you have the items in Requirements installed.
