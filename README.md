@@ -41,6 +41,6 @@ Run it by calling</p>
 <h2>Sample</h2>
 <p>Sample image of the Game in play.</p>
 
-![2048 Game Gui](images/2048_01_HalfPlayed.png | width=600)
+![2048 Game Gui](images/2048_01_HalfPlayed.png width="600")
 
 
