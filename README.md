@@ -5,11 +5,12 @@ A Desktop version of the popular 2048 game made in Python!!
 <h2>Overview</h2>
 
 ![2048 Game Gui](images/2048_01_HalfPlayed.png)
-
+Sample image of the Game in play.
 
 
 <h2>Requirements</h2>
-   1. Python 3 - Written in python 3. You can install python 3 from https://www.python.org/
+This game requires these software and package installations:
+   1. Python 3 - You can install python 3 from https://www.python.org/.
    2. tkinter - tkinter comes preinstalled with python except in some linux based systems. Therefore you will need to check if tkinter is installed to play the game with the GUI
 
 
