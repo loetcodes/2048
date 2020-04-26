@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 #--------------------------------------------------------------------
 #
+# MIT License
+# Copyright (c) 2020 Louisa
 # Version: 1.0.0
 # Date: 11-04-2020
 # Author: loet
-# 
-# MIT License
-# Copyright (c) 2020 Louisa
 #
 #--------------------------------------------------------------------
 
