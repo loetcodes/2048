@@ -4,7 +4,6 @@
 # Version: 1.0.0
 # Date: 17-04-2020
 # Author: loet
-#
 # MIT License
 # Copyright (c) 2020 Louisa
 #
