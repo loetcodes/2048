@@ -54,5 +54,4 @@ def sum_new_tiles(line):
         else:
             first_tile += 1
             second_tile = first_tile + 1
-
     return total

@@ -37,7 +37,7 @@ class TwentyFortyEight:
         self._directions[constants.LEFT] = [(row, 0) for row in range(self._grid_rows)]
         self._directions[constants.RIGHT] = [(row, self._grid_cols - 1)
                                              for row in range(self._grid_rows)]
-        self.reset()
+        self.initialize_game()
 
 
     def __str__(self):
@@ -64,10 +64,11 @@ class TwentyFortyEight:
         """ Gets a list of tuples with the empty positions.
         """
         empty_cells = []
-        for row in range(self._grid_values):
-            for col in range(row):
-                if self._grid_values[row][col] == 0:
-                    empty_cells.append((row, col))
+        if self._grid_values:
+            for row in range(self._grid_values):
+                for col in range(row):
+                    if self._grid_values[row][col] == 0:
+                        empty_cells.append((row, col))
         return empty_cells
 
 
@@ -79,21 +80,13 @@ class TwentyFortyEight:
         tile_row = random.randrange(0, self._grid_rows)
         tile_col = random.randrange(0, self._grid_cols)
 
-        # Option 1: Use a while loop
         # Keep looking for a zero
         while self.get_tile(tile_row, tile_col) != 0:
             tile_row = random.randrange(0, self._grid_rows)
             tile_col = random.randrange(0, self._grid_cols)
-        if self._grid_values[tile_row][tile_col] == 0:
+        if self._grid_values and self._grid_values[tile_row][tile_col] == 0:
             tile_value = random.choice(tile_options)
             self.set_tile(tile_row, tile_col, tile_value)
-
-        # Option 2: Use the get_empty_positions method and choose random.
-        # all_empty_tiles = self.get_empty_positions()
-        # if self.get_empty_positions():
-        #     tile_value = random.choice(tile_options)
-        #     tile_row, tile_col = random.choice(all_empty_tiles)
-        #     self.set_tile(tile_row, tile_col, tile_value)
 
 
     def get_tile(self, row, col):
@@ -134,7 +127,7 @@ class TwentyFortyEight:
 
 
     def set_final_result(self):
-        """ Game is over, sets the final result. Game is won if their is 
+        """ Game is over, sets the final result. Game is won if their is
         atleast one 2048 tile.
         """
         message = "You Lost!"
@@ -145,19 +138,10 @@ class TwentyFortyEight:
         self._result = message
 
 
-    def no_valid_moves(self):
-        """ Checks if their are any more valid moves that result in a change to the game.
-        Returns True or False
+    def any_valid_moves(self, current_grid):
+        """ Makes a move in each direction checking if each position contains
+        the same items. If the board doesn't change in any direction returns False.
         """
-        # If zero in grid, there are valid moves
-        for row in self._grid_values:
-            if 0 in row:
-                return False
-
-        # No empty tiles, copy grid and check available moves
-        current_grid = [[item for item in row] for row in self._grid_values]
-
-        # Move in each direction checking if each position contains same items.
         for direction in constants.DIRECTIONS.values():
             self.move(direction)
             # Check if each position contains same items
@@ -169,6 +153,21 @@ class TwentyFortyEight:
                         self._grid_values = current_grid
                         return False
         return True
+
+
+    def no_valid_moves(self):
+        """ Checks if there are any more valid moves that result in a change
+        to the game. Returns True or False
+        """
+        # If zero in grid, there are valid moves
+        for row in self._grid_values:
+            if 0 in row:
+                return False
+
+        # No empty tiles, copy grid and check any available moves
+        base_grid = [[item for item in row] for row in self._grid_values]
+
+        return self.any_valid_moves(base_grid)
 
 
     def move(self, direction):
@@ -206,9 +205,9 @@ class TwentyFortyEight:
             self.new_tile()
 
 
-    def reset(self):
+    def initialize_game(self):
         """ Resets the game to an empty board with only 2 new tiles.
-        Reset score to 0
+        Resets the score to 0
         """
         self._score = 0
         self._result = ""
