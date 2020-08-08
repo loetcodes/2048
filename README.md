@@ -25,10 +25,7 @@ Remake of the popular 2048 game in python.
 Added 2 new themes Sunset and Sci-fi in addition to the classic theme.
 This version comes with a choice of themes to choose from.
 Note: You can create and add your own themes by modifying the ADDITIONAL_THEMES in constants.py.
-Themes can be changed during game play through the Themes tab at the top of the menu
-
-![Screenshot of 2048](/images/2048_03_HalfPlayed_ThemeChange.png "Theme list in play")
-
+Themes can be changed during game play through the Themes tab at the top of the menu.
 
 ## Demo
 
