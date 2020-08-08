@@ -15,63 +15,20 @@
 
 import tkinter as tk
 import constants
+import themes
 from game import TwentyFortyEight
-
-class GameTheme:
-    """ Class that creates themes used by the GUI
-    """
-    def __init__(self, theme_dict):
-        self.name = theme_dict["name"]
-        self.grid_background = theme_dict["grid_background"]
-        self.side_panel_colors = (theme_dict["side_background"],
-                                  theme_dict["side_color"])
-        self.main_panel_colors = (theme_dict["main_background"],
-                                  theme_dict["main_color"])
-        self.button_colors = (theme_dict["button_background"],
-                              theme_dict["button_color"])
-        self.cell_colors = self.init_colors(theme_dict["cell_backgrounds"],
-                                            theme_dict["cell_colors"])
-
-    @staticmethod
-    def init_colors(background_colors, text_colors):
-        """ Initializes the grid cell background and text colors.
-        Returns a dictionary with pair colors set (background, text).
-        """
-        cell_colors = {}
-        for index, color in enumerate(background_colors):
-            key = 2 ** index
-            if index == 0:
-                key = 0
-            try:
-                text_color = text_colors[index]
-            except IndexError:
-                text_color = text_colors[-1]
-            cell_colors[key] = (color, text_color)
-        cell_colors["default"] = (background_colors[-1], text_colors[-1])
-        return cell_colors
-
-    def get_theme(self):
-        """ Gets the name of a theme
-        """
-        return self.name
-
-    def get_cell_colors(self, key):
-        """ Gets the cell background color and text color.
-        Returns a tuple if the key exists, otherwise returns the default colors
-        """
-        default_val = self.cell_colors.get("default")
-        return self.cell_colors.get(key, default_val)
 
 
 class GameGui(tk.Frame):
     """ Class that runs the game GUI.
     """
-    def __init__(self, game, dimensions, theme, master=None):
+    def __init__(self, game, dimensions, all_themes, master=None):
         tk.Frame.__init__(self, master)
         self.master = master
         self.game = game
         self.dimensions = dimensions
-        self.theme = theme
+        self.game_themes = all_themes
+        self.set_main_theme("Sci-fi")
         self.grid_cells = []
         self.score = None
         self.final_result = None
@@ -83,7 +40,50 @@ class GameGui(tk.Frame):
         self.grid_widget = self.init_grid_widget()
         self.init_grid_cells()
         self.constrain_content(self.grid_widget, self.main_container, self.aspect_ratio)
+        self.menu_bar = tk.Menu(bg=self.theme.side_panel_colors[0],
+                                fg=self.theme.side_panel_colors[1],
+                                relief="flat")
+        self.create_theme_menu()
         self.mainloop()
+
+
+    def create_theme_menu(self):
+        """ Creates a menu that contains a list of themes in a menu.
+        """
+        # Create a dropdown of items
+        themes_list = list(self.game_themes.keys())
+        filemenu = tk.Menu(self.menu_bar, tearoff=0, bg=self.theme.main_panel_colors[0],
+                           fg=self.theme.main_panel_colors[1])
+        for name in themes_list:
+            filemenu.add_command(label=name, command=lambda name=name: self.update_theme(name))
+        filemenu.add_separator()
+        filemenu.add_command(label="Close", command=self.master.quit)
+
+        # Create a cascade and add to game window.
+        self.menu_bar.add_cascade(label="Themes", menu=filemenu)
+        self.master.config(menu=self.menu_bar)
+
+
+    def set_main_theme(self, theme_name):
+        """ Sets the main theme in use.
+        """
+        if self.game_themes.get(theme_name):
+            self.theme = self.game_themes.get(theme_name)
+        else:
+            self.theme = self.game_themes.get("Default")
+
+
+    def update_theme(self, name):
+        """ Set a new theme and update the game based on the new theme.
+        """
+        # Set new theme and update side panel title
+        self.set_main_theme(name)
+        self.grid_widget.configure(bg=self.theme.grid_background)
+        self.update_gui()
+        side_widgets = self.side_panel.winfo_children()
+        title = side_widgets[0]
+        title.configure(bg=self.theme.get_cell_color(2048)[0])
+
 
     def init_panels(self):
         """ Initializes window panels of given width and window height
@@ -99,6 +99,7 @@ class GameGui(tk.Frame):
             self.side_panel = tk.Frame(bg=side_panel_colors[0], width=self.panel_width)
             self.side_panel.pack(anchor=tk.N, fill=tk.BOTH, expand=True, side=tk.LEFT)
 
+
     def init_side_content(self):
         """ Initializes side panel content, i.e the title, instructions, score and new game
         button if the side panel is of atleast minimum width.
@@ -109,6 +110,7 @@ class GameGui(tk.Frame):
             self.display_result()
             self.new_game_button()
 
+
     def init_text(self):
         """ Initializes the side panel with the Game title and instructions.
         """
@@ -116,7 +118,7 @@ class GameGui(tk.Frame):
         title_style = constants.TITLE_FONT
         info_style = constants.TEXT_FONT
         title_width = self.panel_width // 6
-        cell_colors = self.theme.get_cell_colors(2048)
+        cell_colors = self.theme.get_cell_color(2048)
         title = tk.Label(master=self.side_panel, text=constants.GAME_TITLE,
                          bg=cell_colors[0], fg=cell_colors[1],
                          justify=tk.CENTER, font=title_style,
@@ -128,6 +130,7 @@ class GameGui(tk.Frame):
                         bg=side_panel_colors[0], fg=side_panel_colors[1],
                         justify=tk.CENTER, font=info_style, padx=20, pady=title_width)
         info.pack()
+
 
     def init_score(self):
         """ Initializes the side panel with the Game score content.
@@ -147,6 +150,7 @@ class GameGui(tk.Frame):
                               justify=tk.CENTER, font=score_style)
         self.score.pack()
 
+
     def new_game_button(self):
         """ Button that starts a new game.
         """
@@ -159,6 +163,7 @@ class GameGui(tk.Frame):
                                padx=button_width, pady=button_width//2)
         button_name.pack(pady=button_width)
         button_name.bind('<Button-1>', self.new_game)
+
 
     def display_result(self):
         """ Displays the final result of the current game.
@@ -174,6 +179,7 @@ class GameGui(tk.Frame):
                                      padx=result_width, pady=result_width//2)
         self.final_result.pack(pady=result_width//2)
 
+
     def key_down(self, event):
         """ Keydown event handler for directions
         """
@@ -188,12 +194,14 @@ class GameGui(tk.Frame):
             self.game.set_final_result()
         self.update_gui()
 
+
     def bind_direction_keys(self):
         """ Bind main key directions to events.
         """
         for name in constants.DIRECTIONS:
             direction = "<" + name + ">"
             self.master.bind(direction, self.key_down)
+
 
     def get_side_panel_width(self):
         """ Gets the side panel width.
@@ -203,6 +211,7 @@ class GameGui(tk.Frame):
         if panel_width >= 50:
             return panel_width
         return 0
+
 
     def init_grid_widget(self):
         """ Initializes a grid widget frame.
@@ -214,6 +223,7 @@ class GameGui(tk.Frame):
         grid_container.place(relx=0.5, rely=0.5, anchor=tk.CENTER,
                              width=inner_height, height=inner_height)
         return grid_container
+
 
     def init_grid_cells(self):
         """ Initializes the grid cells that hold game display values.
@@ -232,7 +242,7 @@ class GameGui(tk.Frame):
                 num = self.game.get_tile(i, j)
                 num_txt = str(num) if num else ""
                 # Set cell value, colors and label, append to grid cells.
-                colors = self.theme.get_cell_colors(num)
+                colors = self.theme.get_cell_color(num)
                 cell = tk.Frame(master=self.grid_widget, bg=colors[0])
                 cell.grid(row=i, column=j, padx=padding, pady=padding)
                 content = tk.Label(master=cell, text=num_txt,
@@ -242,6 +252,7 @@ class GameGui(tk.Frame):
                 content.pack()
                 grid_row.append(content)
             self.grid_cells.append(grid_row)
+
 
     def constrain_content(self, content_frame, padding_frame, aspect_ratio):
         """ Constrains a content panel within a padding panel based on an
@@ -262,6 +273,7 @@ class GameGui(tk.Frame):
                                 anchor=tk.CENTER, width=desired_width, height=desired_height)
         padding_frame.bind("<Configure>", set_aspect)
 
+
     def update_gui(self):
         """ Updates the gui grid cells with new values from the game and new score.
         """
@@ -276,11 +288,12 @@ class GameGui(tk.Frame):
                 tile_txt = str(tile) if tile != 0 else ""
 
                 # Tiles past the max 2048 receive the default colors
-                tile_colors = self.theme.get_cell_colors(tile)
+                tile_colors = self.theme.get_cell_color(tile)
 
                 # Set new background and label
                 curr_cell.configure(text=tile_txt, bg=tile_colors[0],
                                     fg=tile_colors[1])
+
         # Update score, game message and pending tasks
         try:
             new_score = str(self.game.get_score())
@@ -295,20 +308,19 @@ class GameGui(tk.Frame):
         """ Starts a new game on the gui.
         """
         event.widget.focus_set()
+        self.set_main_theme("Sci-fi")
         self.game.initialize_game()
         self.update_gui()
 
 
 class Window:
-    """ Class controls the window
+    """ Class controls the game window
     """
-    def __init__(self, title, game_constants):
+    def __init__(self, title, game_constants, game_themes):
         self.root = tk.Tk()
-        self.title = title
+        self.root.title(title)
         self.grid_dimensions = self.init_dimensions(game_constants)
-        self.themes = self.init_themes(game_constants.GAME_THEMES)
-        self.set_main_theme("Default Brown")
-        self.init_window()
+        self.themes = self.init_themes(game_themes, game_constants)
 
     @staticmethod
     def init_dimensions(game_constants):
@@ -325,33 +337,26 @@ class Window:
         return dimensions
 
     @staticmethod
-    def init_themes(themes_list):
-        """ Initializes the themes dictionary with all the themes.
-        Sets the main theme on start up
+    def init_themes(game_themes, game_constants):
+        """ Initializes all Themes into a theme dictionary. Returns a
+        dictionary mapping theme names to Theme instances.
         """
-        themes = {}
-        for key, values in themes_list.items():
-            themes[key] = GameTheme(values)
-        return themes
-
-    def set_main_theme(self, theme_name):
-        """ Sets the main theme in use.
-        """
-        self.main_theme = self.themes.get(theme_name)
-
-    def init_window(self):
-        """ Initialize the window values
-        """
-        pass
+        try:
+            new_themes = game_constants.ADDITIONAL_THEMES
+        except AttributeError as error:
+            print(error)
+            new_themes = None
+        all_themes = game_themes.create_all_themes(new_themes)
+        return all_themes
 
     def run_gui(self):
         """ Instantiates the window, and runs the main game gui
         """
         grid_size = self.grid_dimensions["grid_size"]
         new_game = TwentyFortyEight(grid_size, grid_size)
-        app = GameGui(new_game, self.grid_dimensions, self.main_theme, self.root)
+        app = GameGui(new_game, self.grid_dimensions, self.themes, self.root)
         app.mainloop()
 
 
 if __name__ == "__main__":
-    Window('2048 game', constants).run_gui()
+    Window('2048 game', constants, themes).run_gui()

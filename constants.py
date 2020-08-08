@@ -57,38 +57,30 @@ TEXT_FONT = ("Verdana", 16, "bold")
 SCORE_FONT = ("Verdana", 18, "bold")
 BUTTON_FONT = ("Verdana", 14, "bold")
 
-GAME_THEMES = {
-    "Default Brown" : {
-        "name": "Default Brown",
-        "side_background": "#c9c9c9",
-        "side_color": "#776e65",
-        "main_background": "#313131",
-        "main_color": "#f9f6f2",
-        "grid_background": "#bbada0",
-        "button_background": "#bbada0",
-        "button_color": "#f9f6f2",
-        "cell_backgrounds": ("#cdc1b4", "#eee4da", "#ede0c8", "#f2b179",
-                             "#f59563", "#f67c5f", "#f65e3b", "#edcf72",
-                             "#edcc61", "#edc850", "#edc53f", "#edc22e"),
-        "cell_colors": ("#776e65", "#776e65", "#776e65", "#f9f6f2",
-                        "#f9f6f2", "#f9f6f2", "#f9f6f2", "#f9f6f2",
-                        "#f9f6f2", "#f9f6f2", "#f9f6f2", "#f9f6f2")
+# Additional themes are defined and added here.
+ADDITIONAL_THEMES = {
+    "Sunset" : {
+        "name": "Sunset",
+        "button_colors": ("#414141", "#f9f6f2"),
+        "grid_background": "#282828",
+        "cell_backgrounds": ("#414141", "#FE957E", "#FF9153", "#DD1313",
+                             "#AE0000", "#FE640E", "#AA5D02", "#AD9C00",
+                             "#7B6F00", "#E12043", "#B90F1A", "#EDC22E"),
+        "cell_text_colors": ("#F8F8F8", "#F8F8F8", "#F8F8F8", "#F8F8F8",
+                             "#F8F8F8", "#F8F8F8", "#F8F8F8", "#F8F8F8",
+                             "#F8F8F8", "#F8F8F8", "#F8F8F8", "#F8F8F8")
     },
 
-    "Sci-fi Purple" : {
-        "name": "Sci-fi Purple",
-        "side_background": "#c9c9c9",
-        "side_color": "#776e65",
-        "main_background": "#313131",
-        "main_color": "#f9f6f2",
-        "grid_background": "#bbada0",
-        "button_background": "#bbada0",
-        "button_color": "#f9f6f2",
-        "cell_backgrounds": ("#cdc1b4", "#eee4da", "#ede0c8", "#f2b179",
-                             "#f59563", "#f67c5f", "#f65e3b", "#edcf72",
-                             "#edcc61", "#edc850", "#edc53f", "#edc22e"),
-        "cell_colors": ("#776e65", "#776e65", "#776e65", "#f9f6f2",
-                        "#f9f6f2", "#f9f6f2", "#f9f6f2", "#f9f6f2",
-                        "#f9f6f2", "#f9f6f2", "#f9f6f2", "#f9f6f2")
+    "Sci-fi" : {
+        "name": "Sci-fi",
+        "main_panel_colors": ("#313131", "#f9f6f2"),
+        "side_panel_colors": ("#282828", "#C4C4C4"),
+        "grid_background": "#29132E",
+        "cell_backgrounds": ("#321450", "#BF01AC", "#780196", "#7A3DFF",
+                             "#4000CA", "#02BCBC", "#077B7B", "#D80369",
+                             "#9D004B", "#CB9E00", "#937200", "#14A73D"),
+        "cell_text_colors": ("#F8F8F8", "#F8F8F8", "#F8F8F8", "#F8F8F8",
+                             "#F8F8F8", "#F8F8F8", "#F8F8F8", "#F8F8F8",
+                             "#F8F8F8", "#F8F8F8", "#F8F8F8", "#F8F8F8")
     }
 }
